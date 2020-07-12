@@ -12,6 +12,8 @@ showHero: false
 
 </span>
 
+null| [add-self-closing](/docs/lint/rules/ast/add-self-closing) |  MISSING DOCUMENTATION |
+
 ## Javascript
 
 | Rule | Description |

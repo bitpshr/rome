@@ -16,6 +16,10 @@ import {buildSuggestionAdvice} from "../helpers";
 import {createDiagnosticsCategory, orJoin} from "./index";
 
 export const lint = createDiagnosticsCategory({
+	AST_ADD_SELF_CLOSING: {
+		category: "lint/ast/addSelfClosing",
+		message: "HTML and JSX elements without children should have <emphasis>selfClosing</emphasis> set to <emphasis>true</emphasis>.",
+	},
 	JS_NO_NESTED_TERNARY: {
 		category: "lint/js/noNestedTernary",
 		message: "Nesting ternary expressions can make code more difficult to understand.",
