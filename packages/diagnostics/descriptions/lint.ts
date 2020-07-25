@@ -17,6 +17,14 @@ import {buildSuggestionAdvice} from "../helpers";
 import {addEmphasis, createDiagnosticsCategory, orJoin} from "./index";
 
 export const lint = createDiagnosticsCategory({
+	HTML_PREFER_SELF_CLOSING: {
+		category: "lint/html/preferSelfClosing",
+		message: markup`Void HTML elements without children should be marked as self-closing.`,
+	},
+	JSX_PREFER_SELF_CLOSING: {
+		category: "lint/jsx/preferSelfClosing",
+		message: markup`JSX elements without children should be marked as self-closing.`,
+	},
 	JS_SHOUTY_CONSTANTS: (constantLocation: DiagnosticLocation = {}) => ({
 		category: "lint/js/shoutyConstants",
 		message: markup`Redundant constant reference`,
