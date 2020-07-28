@@ -324,7 +324,7 @@ export const browser = [
 	"CSSRuleList",
 	"CSSStyleDeclaration",
 	"CSSStyleRule",
-	"CSSRoot",
+	"",
 	"CSSSupportsRule",
 	"CustomElementRegistry",
 	"customElements",
