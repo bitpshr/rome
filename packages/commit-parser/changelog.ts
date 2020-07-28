@@ -1,4 +1,5 @@
 import child = require("child_process");
+import fs = require("fs");
 import {parseCommit} from '.'
 
 const PROPERTY_DELIM = "<--ROME-PROPERTY-->"
@@ -32,12 +33,6 @@ const GIT_FORMATTERS = {
     subject: "%s"
 }
 
-/**
- * Parses a repository's git log into an array of objects
- *
- * @param config - Map of result object keys to git pretty format placeholders
- * @returns List of commits
- */
 function parseCommitLog(config: Record<string, string>, opts?: { from: string, to: string }): Commit[] {
     const keys = Object.keys(config);
     const cmd = keys.reduce((full, key) =>
@@ -72,12 +67,6 @@ function parseCommitLog(config: Record<string, string>, opts?: { from: string, t
     return commits;
 }
 
-/**
- * Maps commits to an object keyed by associated git tags
- *
- * @param commits - List of commits
- * @returns - Map of git tags to commit lists
- */
 function buildTagMap(commits: Commit[]): Record<string, Commit[]> {
     const versionMap: Record<string, Commit[]> = {};
     let currentTag: string;
@@ -119,8 +108,9 @@ function getNextVersion(): string {
 function updateVersion(version: string): void {
     const packageJson = require('../../package.json').default;
     packageJson.version = version;
-    child.execSync('git add package.json');
-    child.execSync(`git commit -m "chore: bump version to v${version}")`);
+    fs.writeFileSync('../../package.json', JSON.stringify(packageJson))
+    child.execSync('git add ../../package.json');
+    child.execSync(`git commit -m "chore: bump version to v${version}"`);
 }
 
-console.log(updateVersion(getNextVersion()))
+updateVersion(getNextVersion())
