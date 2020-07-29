@@ -73,7 +73,7 @@ export const createCommitParser = createParser((ParserCore) =>
 					!this.matchToken("Exclamation") &&
 					!this.matchToken("Colon")
 				) {
-					commitType = ""
+					commitType = "";
 				}
 			} else {
 				this.unexpectedDiagnostic({
