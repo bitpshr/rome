@@ -2,6 +2,7 @@ import child = require("child_process");
 
 import {markup} from "@romefrontend/cli-layout";
 import {Reporter} from "@romefrontend/cli-reporter";
+import { mark } from "@romefrontend/formatter";
 import {readFileText} from "@romefrontend/fs";
 import {AbsoluteFilePath, createAbsoluteFilePath} from "@romefrontend/path";
 
@@ -18,7 +19,7 @@ const ROOT = (() => {
 			return path;
 		}
 
-		if (path.getBasename() === "scripts") {
+		if (path.getBasename() === "packages") {
 			pickNext = true;
 		}
 	}
@@ -58,10 +59,10 @@ interface Commit {
 	};
 }
 
-enum ReleaseType {
-	major = "major",
-	minor = "minor",
-	patch = "patch",
+const ReleaseType = {
+	major: "major",
+	minor: "minor",
+	patch: "patch",
 }
 
 /**
@@ -117,7 +118,7 @@ async function getCurrentVersion(): Promise<string> {
  *
  * @returns - Type of release
  */
-function getReleaseType(): ReleaseType {
+function getReleaseType(): string {
 	const version = child.spawnSync("git", ["describe", "--tags", "--abbrev=0"]).stdout.toString().trim();
 
 	const newCommits = parseCommitLog(
@@ -266,7 +267,7 @@ function raiseError(message: string, keepAlive = false): void {
  * @returns - New version
  */
 function updateVersion(
-	releaseType: ReleaseType | string,
+	releaseType: string,
 	cwd: AbsoluteFilePath,
 ): string {
 	const newVersion = child.spawnSync(
@@ -288,15 +289,18 @@ export async function main() {
 	if (!isMainBranch()) {
 		raiseError("Change logs must be generated on the main branch.");
 	}
+	REPORTER.success(markup`The correct branch is being used.`);
 
 	// 2. Ensure the branch is clean
 	if (isDirty()) {
 		raiseError("Uncommitted changes exist on the main branch.");
 	}
+	REPORTER.success(markup`No uncommitted changes detected.`);
 
 	// 3. Update the root package version
 	const targetReleaseType = getReleaseType();
 	const newVersion = updateVersion(targetReleaseType, ROOT);
+	REPORTER.success(markup`The root package version was updated to ${newVersion}.`);
 
 	// 4. Ensure the version is not yet taken
 	if (!isNewVersion(newVersion)) {
@@ -305,10 +309,13 @@ export async function main() {
 			true,
 		);
 	}
+	REPORTER.success(markup`The package version ${newVersion} is clear to use.`);
 
 	// 5. Update the rome package version
 	updateVersion(newVersion, PACKAGES.append("rome"));
+	REPORTER.success(markup`The rome package version was updated to ${newVersion}.`);
 
 	// 6. Create a resulting tag
 	createTag(newVersion);
+	REPORTER.success(markup`A new v${newVersion} git tag was created.`);
 }
